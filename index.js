@@ -10,9 +10,10 @@
 	var passport=require("passport")
 	var local=require("passport-local")
 	var routes=require("./routers.js")
+	var key=require("./key.js")
 
 
-	var mongoDB="mongodb://sseun43:eruption43@ds121575.mlab.com:21575/sseun43"
+	var mongoDB="mongodb://"+key.username+":"+key.password+"@ds121575.mlab.com:21575/sseun43"
 	//mongoose.Promise=global.Promise
 	mongoose.connect(mongoDB,{
 		useMongoClient:true

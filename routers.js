@@ -308,7 +308,7 @@ var parsestring=function(str){
 			})
 
 
-	router.get('/logout',isAuthenticated,function(req,res){
+	router.get('/logout',loggedInSecurity,function(req,res){
 		req.logout()
 		res.json({response:"user logged out"})
 	})
