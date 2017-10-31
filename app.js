@@ -27,6 +27,7 @@
 	//db.on('error', console.error.bind(console, 'MongoDB connection error:'));// console logs the error
 
 	//MIDDLEWARE
+	app.set("port", process.env.PORT || 3000)
 	app.use(cors())
 	app.use(cookieParser())
 	app.use(parser.urlencoded({extended:false}))//body parser
@@ -88,7 +89,6 @@
 	//OPEN FUNCTIONS
 	//________________________________________________________________________________________________________________________________
 	// use req.logout() to log current user out
-
-	app.listen(3000)
-
+	app.listen(app.get("port"))
+	
 
