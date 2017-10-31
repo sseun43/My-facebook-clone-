@@ -39,6 +39,9 @@ var parsestring=function(str){
 
 	//__________________________________________________________________________________________________________________________________________
 	//ROUTES 
+	router.get('/',function(req,res){
+		res.json({response:"Welcome to my social network API"})
+	})
 	router.post('/new',function(req,res){ 
 	   var personInstance=new Person({
 			name:req.body.name,
