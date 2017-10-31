@@ -1,6 +1,7 @@
 var express=require('express')
 var router=express.Router();
 var passport=require("passport")
+var Person=require("./schema_list/person_schema.js")
 
 var parsestring=function(str){
 	        return str.split(",");
@@ -8,7 +9,7 @@ var parsestring=function(str){
 
 	var loggedInSecurity=function(req,res,next){ // logged in security make sure that a user is logged in b4 certain routings are perfomed
 		if(req.isAuthenticated()){ // built in function from passport to check if a user is authenticated
-			next()
+			return next()
 		}else{
 			console.log("nobody is logged in")
 			res.redirect("/login")
@@ -20,7 +21,7 @@ var parsestring=function(str){
 		var arr=[]
 		theArr.forEach(function(v,i,a){
 			Person.findById(v)
-			.select({name:1,_id:1})
+			.select({name:1,_id:1,status:1})
 			.exec(function(err,result){
 				if(err){
 					res.json({error:err})
@@ -43,7 +44,8 @@ var parsestring=function(str){
 			name:req.body.name,
 			age:req.body.age,
 			password:req.body.password,
-			email:req.body.email
+			email:req.body.email,
+			profilePicture:req.body.profilePicture
 
 		})
 		personInstance.save(function(err){
@@ -58,7 +60,7 @@ var parsestring=function(str){
 
 	router.get('/list',loggedInSecurity,function(req,res){
 		Person.find()
-		.select({name:1,_id:0})
+		.select({name:1,_id:1})
 		.exec(function(err,result){
 			if(err){console.log(err)}
 				else{
@@ -92,7 +94,7 @@ var parsestring=function(str){
 
 
 	router.post('/mystatus',loggedInSecurity,function(req,res){
-		req.user.status.push(req.body.status)
+		req.user.status.push(req.user.name+" : "+req.body.status)
 		req.user.save(function(err){ //possible to save to the Mongo by just calling save because passport is using mongoose static method Findone
 			if(err){
 				res.json({error:err})
@@ -104,7 +106,7 @@ var parsestring=function(str){
 
 	router.get('/allstatus',loggedInSecurity,function(req,res){
 		Person.find()
-		.select({name:1,status:1,_id:0})
+		.select({name:1,status:1,_id:1})
 		.exec(function(err,result){
 			if(err){
 				res.json({error:err})
@@ -119,10 +121,10 @@ var parsestring=function(str){
 		.exec(function(err,result){
 			console.log(result);
 			if(err){
-				res.json({error:err})
+				return res.json({error:err})
 			}else{
 				if(result.friendRequest.indexOf(req.user._id)!==-1){
-					res.json({error:"friend request already sent"})
+					return res.json({error:"friend request already sent"})
 				}
 				if(result.friendList.indexOf(req.user._id)!==-1){
 					res.json({error:"you are already friends"})
@@ -130,7 +132,7 @@ var parsestring=function(str){
 				result.friendRequest.push(req.user._id)
 				result.save(function(err){
 					if(err){
-					res.json({error:err})
+					return res.json({error:err})
 					}else{
 						res.json({response:"friend request sent"})
 					}
@@ -168,9 +170,17 @@ var parsestring=function(str){
 					if(err){
 						res.json({error:err})
 					}else{
-					console.log(result.friendRequest);
 					result.friendList.push(result.friendRequest[index])
-					result.friendRequest.splice(index,1);
+					Person.findById(req.params.friend)
+					.exec(function(err,result2){
+						if(err){
+							console.log("could not find friend")
+						}else{
+							result2.friendList.push(req.user._id)
+							result2.save();
+						}
+					})
+					result.friendRequest.splice(index,1)
 					result.save(function(err){
 						if(err){
 							res.json({error:err})
@@ -180,6 +190,8 @@ var parsestring=function(str){
 					})
 				}
 				})
+			}else{
+				return res.json({error:"friend not on list"})
 			}
 		}
 	}) //used to accept friend request
@@ -207,6 +219,7 @@ var parsestring=function(str){
 			}
 		}
 	}) //used to reject friend request
+
 	router.get('/removefriend/:friend/',loggedInSecurity,function(req,res){
 		if(req.user.friendList.length===0){
 			res.json({error:"no friends"})
@@ -216,8 +229,18 @@ var parsestring=function(str){
 				Person.findById(req.user._id)
 				.exec(function(err,result){
 					if(err){
-						res.json({error:err})
+						return res.json({error:err})
 					}else{
+					Person.findById(req.params.friend)
+					.exec(function(err,result2){
+						if(err){
+							return res.json({error:err})
+						}else{
+							var index2=result2.friendList.indexOf(req.user._id)
+							result2.friendList.splice(index2,1)
+							result2.save()
+						}
+					})		
 					result.friendList.splice(index,1);
 					result.save(function(err){
 						if(err){
@@ -236,50 +259,52 @@ var parsestring=function(str){
 		res.json(req.user.messaging);// use populate for the members 
 	})
 	router.post('/createmessage/:friend',loggedInSecurity, function(req,res){
-		
+		if(req.user.friendList.indexOf(req.params.friend)===-1){
+			return res.json({error:"you are not friends"})
+		}
 		var theFriends=parsestring(req.params.friend); // put also case where there is no parameter
 		Person.findById(req.user._id)
 		.exec(function(err,result){
 			if(err){
-				res.json({error:err})
+				return res.json({error:err})
 			}else{
 				var doc=result.messaging.id(req.body.messageId)
 				if(doc){ 
 					console.log("we have doc")
-					doc.messages.push(req.body.message)
+					doc.messages.push(req.user.name+" : "+req.body.message)
 					Person.findById(req.params.friend)
-					.exec(function(err,friendResult){
-						if(err){
-							res.json({error:err})
-						}else{
-							var friendDoc=friendResult.messaging.filter(function(v){
-								return v.participants[0]=req.user._id
-							}).pop()
-							friendDoc.messages.push(req.body.message);
-						friendResult.save(function(err,result){
+						.exec(function(err,friendResult){ 
 							if(err){
-								res.json({error:err})
+								return res.json({error:err})
 							}else{
-								res.json({response:"properly saved"})
+								var friendDoc=friendResult.messaging.filter(function(v){
+									return v.participants[0]=req.user._id
+								}).pop()
+								friendDoc.messages.push(req.user.name+" : "+req.body.message);
+								friendResult.save(function(err,result){
+									if(err){
+										return res.json({error:err})
+									}else{
+										return res.json({response:"properly saved"})
+									}
+								})
 							}
 						})
-						}
-					})
 				}else{ 
 					console.log(req.body.message)
 					result.messaging.push({ 
 						participants:theFriends,
-						messages:[req.body.message]
+						messages:[req.user.name+" : "+req.body.message]
 					})
 
 					Person.findById(req.params.friend)
 					.exec(function(err,friendResult){
 						if(err){
-							res.json({error:err});
+							return res.json({error:err});
 						}else{
 							friendResult.messaging.push({
 								participants:[req.user._id],// fix this to include friends in group 2
-								messages:[req.body.message]
+								messages:[req.user.name+" : "+req.body.message]
 							})
 							friendResult.save(function(err,result){
 								if(err){
@@ -298,7 +323,6 @@ var parsestring=function(str){
 							console.log(err)
 						}else{
 							console.log("participants saved")
-							res.json({response:"properly saved"})
 							}
 								})
 
