@@ -258,8 +258,19 @@ var parsestring=function(str){
 		}
 	})// used to remove friend from friend list
 	router.get("/allmessages",loggedInSecurity,function(req,res){
+		Person.findById(req.user._id)
+		.select({messaging:1,_id:0})
+		.populate("messaging.participants","name _id")
+		.exec(function(err,result){
+			if(err){
+				res.json({error:err})
+			}else{
+				res.json(result)
+			}
+
+		})
 		
-		res.json(req.user.messaging);// use populate for the members 
+		
 	})
 	router.post('/createmessage/:friend',loggedInSecurity, function(req,res){
 		if(req.user.friendList.indexOf(req.params.friend)===-1){
