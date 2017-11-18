@@ -30,7 +30,8 @@
 	app.set("port", process.env.PORT || 3000)
 	app.use(cors())
 	app.use(cookieParser())
-	app.use(parser.json())//app.use(parser.urlencoded({extended:false}))//body parser
+	app.use(parser.urlencoded({extended:false}))//body parser
+	app.use(parser.json())
 	app.use(session({
 	secret: "TKRv0IJs=HYqrvagQ#&!F!%V]Ww/4KiVs$s,<<MX",
 	resave: true,
