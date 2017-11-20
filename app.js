@@ -28,7 +28,7 @@
 
 	//MIDDLEWARE
 	app.set("port", process.env.PORT || 3000)
-	app.use(cors())
+	app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
 	app.use(cookieParser("TKRv0IJs=HYqrvagQ#&!F!%V]Ww/4KiVs$s,<<MX"))
 	app.use(parser.urlencoded({extended:true}))//body parser
 	app.use(parser.json())
