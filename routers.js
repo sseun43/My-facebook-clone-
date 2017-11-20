@@ -92,7 +92,7 @@ var parsestring=function(str){
 	})// for viewing the whole of another persons profile
 
 	router.get('/myprofile',function(req,res){
-		res.json({success:"success"})//({user:req.user})// passport populate req.user for us
+		res.json({success:"success",user:req.user})//({user:req.user})// passport populate req.user for us
 	}) //show the ur whole profile
 
 
