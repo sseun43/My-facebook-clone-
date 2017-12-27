@@ -33,6 +33,10 @@
 	//app.set("port", process.env.PORT || 3000)
 	var io     = require('socket.io')(http);
 	http.listen(process.env.PORT || 3000)
+
+	io.on('connection',function(socket){  
+    console.log("A user is connected");
+})
 	
 	app.io = io;
 
