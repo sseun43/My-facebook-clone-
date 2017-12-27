@@ -13,6 +13,8 @@
 	var key=require("./key.js")
 
 
+
+
 	var mongoDB="mongodb://"+key.username+":"+key.password+"@ds121575.mlab.com:21575/sseun43"
 	//mongoose.Promise=global.Promise
 	mongoose.connect(mongoDB,{
@@ -28,7 +30,13 @@
 
 	//MIDDLEWARE
 	app.set("port", process.env.PORT || 3000)
-	app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
+
+	var server = app.listen(app.get("port"))
+	var io     = require('socket.io').listen(server);
+	app.io = io;
+
+
+	app.use(cors({credentials: true, origin: 'http://localhost:3000'}));// use this to make sure that browser can send cookies
 	app.use(cookieParser("TKRv0IJs=HYqrvagQ#&!F!%V]Ww/4KiVs$s,<<MX"))
 	app.use(parser.urlencoded({extended:true}))//body parser
 	app.use(parser.json())
@@ -89,7 +97,8 @@
 
 	//OPEN FUNCTIONS
 	//________________________________________________________________________________________________________________________________
-	// use req.logout() to log current user out
-	app.listen(app.get("port"))
+
+
+
 	
 

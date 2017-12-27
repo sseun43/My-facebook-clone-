@@ -3,6 +3,8 @@ var router=express.Router();
 var passport=require("passport")
 var Person=require("./schema_list/person_schema.js")
 
+//var io = require("./app.js")
+
 var parsestring=function(str){
 	        return str.split(",");
 	    }
@@ -337,6 +339,8 @@ var parsestring=function(str){
 							console.log(err)
 						}else{
 							console.log("participants saved")
+							
+						req.app.io.emit('message', "message");	
 							}
 								})
 
