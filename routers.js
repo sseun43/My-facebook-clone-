@@ -284,7 +284,9 @@ var parsestring=function(str){
 			if(err){
 				return res.json({error:err})
 			}else{
-				var doc=result.messaging.id(req.body.messageId)
+				var doc=result.messaging.find(function(v){
+					return v.participants[0]._id===req.params.friend
+				})//id(req.body.messageId)
 				if(doc){ 
 					console.log("we have doc")
 					doc.messages.push(req.user.name+" : "+req.body.message)
@@ -293,9 +295,9 @@ var parsestring=function(str){
 							if(err){
 								return res.json({error:err})
 							}else{
-								var friendDoc=friendResult.messaging.filter(function(v){
-									return v.participants[0]=req.user._id
-								}).pop()
+								var friendDoc=friendResult.messaging.find(function(v){
+									return v.participants[0]===req.user._id
+								})//.pop()
 								friendDoc.messages.push(req.user.name+" : "+req.body.message);
 								friendResult.save(function(err,result){
 									if(err){
