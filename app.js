@@ -34,10 +34,12 @@
 	var io     = require('socket.io')(http);
 	http.listen(process.env.PORT || 3000)
 
+	io.set("transports", ["websocket"]);
+
 	io.on('connection',function(socket){  
     console.log("A user is connected");
 })
-	io.origins(['http://localhost:3000']);
+
 	
 	app.io = io;
 
