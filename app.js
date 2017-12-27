@@ -1,5 +1,6 @@
 	var express=require('express')
 	var app=express()
+	var http = require('http').Server(app);
 	var mongoose=require("mongoose")
 	var cors=require("cors")
 	var session=require("express-session")
@@ -31,8 +32,8 @@
 	//MIDDLEWARE
 	app.set("port", process.env.PORT || 3000)
 
-	var server = app.listen(app.get("port"))
-	var io     = require('socket.io').listen(server);
+	http.listen(app.get("port"))
+	var io     = require('socket.io')(http);
 	app.io = io;
 
 
