@@ -37,6 +37,7 @@
 	io.on('connection',function(socket){  
     console.log("A user is connected");
 })
+	io.origins(['http://localhost:3000']);
 	
 	app.io = io;
 
