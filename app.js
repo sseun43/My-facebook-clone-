@@ -44,7 +44,7 @@
 	app.io = io;
 
 
-	app.use(cors({credentials: true, origin: 'http://localhost:3000'}));// use this to make sure that browser can send cookies
+	app.use(cors({credentials: true, origin: 'https://fierce-dusk-20604.herokuapp.com'}));// use this to make sure that browser can send cookies
 	app.use(cookieParser("TKRv0IJs=HYqrvagQ#&!F!%V]Ww/4KiVs$s,<<MX"))
 	app.use(parser.urlencoded({extended:true}))//body parser
 	app.use(parser.json())
