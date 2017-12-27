@@ -30,9 +30,9 @@
 	//db.on('error', console.error.bind(console, 'MongoDB connection error:'));// console logs the error
 
 	//MIDDLEWARE
-	app.set("port", process.env.PORT || 3000)
+	//app.set("port", process.env.PORT || 3000)
 	var io     = require('socket.io')(http);
-	http.listen(app.get("port"))
+	http.listen(process.env.PORT || 3000)
 	
 	app.io = io;
 
