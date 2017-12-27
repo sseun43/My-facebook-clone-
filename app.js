@@ -31,9 +31,9 @@
 
 	//MIDDLEWARE
 	app.set("port", process.env.PORT || 3000)
-
-	http.listen(app.get("port"))
 	var io     = require('socket.io')(http);
+	http.listen(app.get("port"))
+	
 	app.io = io;
 
 
