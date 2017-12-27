@@ -284,10 +284,10 @@ var parsestring=function(str){
 			if(err){
 				return res.json({error:err})
 			}else{
-				var doc=result.messaging.filter(function(v){
+				/*var doc=result.messaging.filter(function(v){
 					return v.participants[0]._id===req.params.friend
-				}).pop()//id(req.body.messageId)
-				if(doc){ 
+				}).pop()//id(req.body.messageId)*/
+				if(req.params.friend){ 
 					console.log("we have doc")
 					doc.messages.push(req.user.name+" : "+req.body.message)
 					Person.findById(req.params.friend)
