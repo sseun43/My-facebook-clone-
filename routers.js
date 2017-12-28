@@ -2,6 +2,7 @@ var express=require('express')
 var router=express.Router();
 var passport=require("passport")
 var Person=require("./schema_list/person_schema.js")
+var uuidv1 = require('uuid/v1');
 
 //var io = require("./app.js")
 
@@ -275,29 +276,30 @@ var parsestring=function(str){
 		
 	})
 	router.post('/createmessage/:friend',loggedInSecurity, function(req,res){
+			var daUniqueId = uuidv1()
 		if(req.user.friendList.indexOf(req.params.friend)===-1){
 			return res.json({error:"you are not friends"})
 		}
+		//var formattedObj=req.body.messageObj.messages.push(req.body.message)
 		var theFriends=parsestring(req.params.friend); // put also case where there is no parameter
 		Person.findById(req.user._id)
 		.exec(function(err,result){
 			if(err){
 				return res.json({error:err})
 			}else{
-				/*var doc=result.messaging.filter(function(v){
-					return v.participants[0]._id===req.params.friend
-				}).pop()//id(req.body.messageId)*/
-				if(req.params.friend){ 
+				var doc=result.messaging.id(messageId)
+					
+				if(doc){ 
 					console.log("we have doc")
-					doc.messages.push(req.user.name+" : "+req.body.message)
+					//result.messaging.id(req.body.messageId).remove() /// delete old documment
+					//result.messaging.push(formattedObj) /// replace it with new document
+					doc.messages.push(message)
 					Person.findById(req.params.friend)
 						.exec(function(err,friendResult){ 
 							if(err){
 								return res.json({error:err})
 							}else{
-								var friendDoc=friendResult.messaging.filter(function(v){
-									return v.participants[0]===req.user._id
-								}).pop()
+								var friendDoc=friendResult.messaging.id(messageId)
 								friendDoc.messages.push(req.user.name+" : "+req.body.message);
 								friendResult.save(function(err,result){
 									if(err){
@@ -311,6 +313,7 @@ var parsestring=function(str){
 				}else{ 
 					console.log(req.body.message)
 					result.messaging.push({ 
+						_id:daUniqueId,
 						participants:theFriends,
 						messages:[req.user.name+" : "+req.body.message]
 					})
@@ -321,6 +324,7 @@ var parsestring=function(str){
 							return res.json({error:err});
 						}else{
 							friendResult.messaging.push({
+								_id:daUniqueId,
 								participants:[req.user._id],// fix this to include friends in group 2
 								messages:[req.user.name+" : "+req.body.message]
 							})
