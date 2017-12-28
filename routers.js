@@ -287,25 +287,25 @@ var parsestring=function(str){
 			if(err){
 				return res.json({error:err})
 			}else{
-				var doc=result.messaging.id(messageId)
+				var doc=result.messaging.id(req.body.messageId)
 					
 				if(doc){ 
 					console.log("we have doc")
 					//result.messaging.id(req.body.messageId).remove() /// delete old documment
 					//result.messaging.push(formattedObj) /// replace it with new document
-					doc.messages.push(message)
+					doc.messages.push(req.user.name+" : "+req.body.message)
 					Person.findById(req.params.friend)
 						.exec(function(err,friendResult){ 
 							if(err){
 								return res.json({error:err})
 							}else{
-								var friendDoc=friendResult.messaging.id(messageId)
+								var friendDoc=friendResult.messaging.id(req.body.messageId)
 								friendDoc.messages.push(req.user.name+" : "+req.body.message);
 								friendResult.save(function(err,result){
 									if(err){
 										return res.json({error:err})
 									}else{
-										return res.json({response:"properly saved"})
+										console.log("first stage saved")
 									}
 								})
 							}
@@ -347,6 +347,7 @@ var parsestring=function(str){
 							console.log("participants saved")
 							
 						req.app.io.emit('message', "message");	
+						return res.json({response:"properly saved"})
 							}
 								})
 
